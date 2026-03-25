@@ -1,6 +1,6 @@
 [package]
 name = "updown"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 description = "Command-line interface for the updown.io monitoring API"
 license = "MIT OR Apache-2.0"
