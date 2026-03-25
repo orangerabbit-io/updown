@@ -1,0 +1,8 @@
+/target
+updown-lib/target
+updown/target
+.direnv
+.env
+*.pem
+*.key
+node_modules

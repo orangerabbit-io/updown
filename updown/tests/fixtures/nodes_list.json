@@ -1,0 +1,11 @@
+{
+  "lan": {
+    "ip": "1.2.3.4",
+    "ip6": "::1",
+    "city": "Los Angeles",
+    "country": "United States",
+    "country_code": "US",
+    "lat": 34.05,
+    "lng": -118.24
+  }
+}
