@@ -1,0 +1,3 @@
+[workspace]
+members = ["updown-lib", "updown"]
+resolver = "2"

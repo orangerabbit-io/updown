@@ -1,0 +1,12 @@
+{
+  "token": "abc123",
+  "url": "https://example.com",
+  "alias": "Example",
+  "last_status": 200,
+  "uptime": 99.97,
+  "down": false,
+  "period": 60,
+  "apdex_t": 0.5,
+  "enabled": true,
+  "type": "https"
+}

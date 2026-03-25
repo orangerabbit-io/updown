@@ -1,0 +1,9 @@
+[
+  {
+    "id": "rec123",
+    "type": "email",
+    "name": "Admin",
+    "value": "admin@example.com",
+    "selected": true
+  }
+]

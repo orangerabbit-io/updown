@@ -1,0 +1,9 @@
+[
+  {
+    "token": "sp123",
+    "url": "https://status.example.com",
+    "name": "My Status",
+    "visibility": "public",
+    "checks": ["abc123"]
+  }
+]
