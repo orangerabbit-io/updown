@@ -36,7 +36,7 @@ pub struct Node {
 ///
 /// Includes the location `code` key from the API response map, which is
 /// not part of the [`Node`] struct itself.
-#[derive(Debug, Tabled)]
+#[derive(Debug, Serialize, Tabled)]
 pub struct NodeRow {
     /// Location code (e.g. `"fra"`, `"sin"`).
     #[tabled(rename = "CODE")]
