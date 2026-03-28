@@ -16,6 +16,8 @@ anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 serde_json = "1"
 tabled = "0.17"
+toon-format = "0.4"
+serde = { version = "1", features = ["derive"] }
 
 [dev-dependencies]
 mockito = "1"

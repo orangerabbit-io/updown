@@ -102,6 +102,30 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let rows: Vec<StatusPageRow> = pages.iter().map(StatusPageRow::from).collect();
             output::print_table(&rows);
         }
+        OutputMode::Axi => {
+            let pages: Vec<StatusPage> = resp.json()?;
+            let public_count = pages
+                .iter()
+                .filter(|p| p.visibility.as_deref() == Some("public"))
+                .count();
+            let checks_count: usize = pages
+                .iter()
+                .map(|p| p.checks.as_ref().map(|c| c.len()).unwrap_or(0))
+                .sum();
+            let aggregate = format!(
+                "{} status pages, {} public, {} total checks monitored",
+                pages.len(),
+                public_count,
+                checks_count
+            );
+            let rows: Vec<StatusPageRow> = pages.iter().map(StatusPageRow::from).collect();
+            output::print_axi_list(
+                &rows,
+                "status_pages",
+                &aggregate,
+                &["status-pages create --checks <tokens>"],
+            );
+        }
     }
 
     Ok(())
@@ -154,6 +178,17 @@ fn create(
                 sp.token,
                 sp.url.unwrap_or_default()
             ));
+        }
+        OutputMode::Axi => {
+            let sp: StatusPage = resp.json()?;
+            output::print_axi_confirm(
+                &format!(
+                    "Status page created: {} ({})",
+                    sp.token,
+                    sp.url.unwrap_or_default()
+                ),
+                &["status-pages list"],
+            );
         }
     }
 
@@ -208,6 +243,13 @@ fn update(
             let sp: StatusPage = resp.json()?;
             output::print_confirm(&format!("Status page updated: {}", sp.token));
         }
+        OutputMode::Axi => {
+            let sp: StatusPage = resp.json()?;
+            output::print_axi_confirm(
+                &format!("Status page updated: {}", sp.token),
+                &["status-pages list"],
+            );
+        }
     }
 
     Ok(())
@@ -223,6 +265,12 @@ fn delete(client: &Client, mode: OutputMode, token: &str) -> Result<()> {
         }
         OutputMode::Table => {
             output::print_confirm(&format!("Deleted status page {}", token));
+        }
+        OutputMode::Axi => {
+            output::print_axi_confirm(
+                &format!("Deleted status page {}", token),
+                &["status-pages list"],
+            );
         }
     }
 

@@ -3,11 +3,29 @@
 //! All requests attach the `X-API-KEY` header and request gzip encoding.
 //! Non-2xx responses are converted into typed errors before being returned.
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use reqwest::blocking::{Client as HttpClient, Response};
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
+use std::fmt;
+
+/// A known API error that can be displayed as structured output in AXI mode.
+#[derive(Debug)]
+pub struct ApiError {
+    /// HTTP status code (401, 403, 404, 422, 429).
+    pub status_code: u16,
+    /// Human-readable error message.
+    pub message: String,
+}
+
+impl fmt::Display for ApiError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl std::error::Error for ApiError {}
 
 /// Blocking HTTP client preconfigured for the updown.io API.
 ///
@@ -144,12 +162,35 @@ impl Client {
         }
         let url = resp.url().to_string();
         let body = resp.text().unwrap_or_default();
-        match status.as_u16() {
-            401 | 403 => bail!("Authentication failed (HTTP {}): {}", status, body),
-            404 => bail!("Not found (HTTP {}): {}", status, body),
-            422 => bail!("Validation error (HTTP {}): {}", status, body),
-            429 => bail!("Rate limited (HTTP {}): {}", status, body),
-            _ => bail!("API error (HTTP {}) for {}: {}", status, url, body),
+        let code = status.as_u16();
+        let message = match code {
+            401 | 403 => format!("Authentication failed (HTTP {}): {}", status, body),
+            404 => format!("Not found (HTTP {}): {}", status, body),
+            422 => format!("Validation error (HTTP {}): {}", status, body),
+            429 => format!("Rate limited (HTTP {}): {}", status, body),
+            _ => format!("API error (HTTP {}) for {}: {}", status, url, body),
+        };
+        Err(ApiError {
+            status_code: code,
+            message,
         }
+        .into())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_api_error_downcast() {
+        let err = ApiError {
+            status_code: 401,
+            message: "Authentication failed".to_string(),
+        };
+        let anyhow_err: anyhow::Error = err.into();
+        let downcast = anyhow_err.downcast_ref::<ApiError>().unwrap();
+        assert_eq!(downcast.status_code, 401);
+        assert_eq!(downcast.message, "Authentication failed");
     }
 }

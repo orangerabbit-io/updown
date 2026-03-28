@@ -68,7 +68,7 @@ pub struct Check {
 }
 
 /// Flattened, display-ready representation of a [`Check`] for table output.
-#[derive(Debug, Tabled)]
+#[derive(Debug, Serialize, Tabled)]
 pub struct CheckRow {
     #[tabled(rename = "TOKEN")]
     pub token: String,
@@ -148,7 +148,7 @@ pub struct Downtime {
 }
 
 /// Flattened, display-ready representation of a [`Downtime`] for table output.
-#[derive(Debug, Tabled)]
+#[derive(Debug, Serialize, Tabled)]
 pub struct DowntimeRow {
     #[tabled(rename = "ID")]
     pub id: String,
@@ -235,6 +235,20 @@ mod tests {
         assert_eq!(row.status, "up");
         assert_eq!(row.uptime, "99.97%");
         assert_eq!(row.period, "30s");
+    }
+
+    #[test]
+    fn test_check_row_serialize() {
+        let row = CheckRow {
+            token: "abc".to_string(),
+            status: "up".to_string(),
+            url: "https://example.com".to_string(),
+            uptime: "99.97%".to_string(),
+            apdex: "0.50".to_string(),
+            period: "60s".to_string(),
+        };
+        let json = serde_json::to_string(&row).unwrap();
+        assert!(json.contains("abc"));
     }
 
     #[test]

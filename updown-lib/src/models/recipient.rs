@@ -27,7 +27,7 @@ pub struct Recipient {
 }
 
 /// Flattened, display-ready representation of a [`Recipient`] for table output.
-#[derive(Debug, Tabled)]
+#[derive(Debug, Serialize, Tabled)]
 pub struct RecipientRow {
     #[tabled(rename = "ID")]
     pub id: String,
