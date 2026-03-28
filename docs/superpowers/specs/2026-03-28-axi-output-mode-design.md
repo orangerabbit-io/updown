@@ -55,7 +55,7 @@ A `summary:` line prepended to list output, computed in the handler from the ful
 
 | Command | Aggregate |
 |---|---|
-| `checks list` | `{total} checks, {down_count} down, worst_uptime: {min}%, worst_apdex: {min}` |
+| `checks list` | `{total} checks, {down_count} down, worst_uptime: {min}%` |
 | `checks downtimes` | `{total} downtimes, total_duration: {sum}s` |
 | `checks metrics` | `apdex: {apdex}` (metrics internals are opaque `serde_json::Value`; only surface `apdex` which is a typed field) |
 | `nodes list` | `{total} nodes across {country_count} countries` |
@@ -67,7 +67,7 @@ No aggregate for single-item detail views or mutations.
 ### Example output
 
 ```
-summary: 3 checks, 1 down, worst_uptime: 98.50%, worst_apdex: 0.82
+summary: 3 checks, 1 down, worst_uptime: 98.50%
 checks[3]{token,status,url,uptime}:
   abc1,up,https://api.example.com,99.97%
   def2,down,https://web.example.com,98.50%
@@ -90,7 +90,7 @@ Static per-command hints, AXI mode only. After mutations, hints include the conc
 | `checks metrics` | `checks get <token>, checks downtimes <token>` |
 | `nodes list` | `nodes ips --ipv4, nodes ips --ipv6` |
 | `nodes ips` | `nodes list` |
-| `recipients list` | `recipients create --type <type> --value <value>` |
+| `recipients list` | `recipients create <type> <value>` |
 | `recipients create` | `recipients list` (id from response) |
 | `recipients delete` | `recipients list` |
 | `status-pages list` | `status-pages create --checks <tokens>` |
