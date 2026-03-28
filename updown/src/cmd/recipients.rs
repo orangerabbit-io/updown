@@ -81,7 +81,11 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
                 .map(|(t, c)| format!("{} {}", c, t))
                 .collect::<Vec<_>>()
                 .join(", ");
-            let aggregate = format!("{} recipients ({})", recipients.len(), type_summary);
+            let aggregate = if type_summary.is_empty() {
+                format!("{} recipients", recipients.len())
+            } else {
+                format!("{} recipients ({})", recipients.len(), type_summary)
+            };
             let rows: Vec<RecipientRow> = recipients.iter().map(RecipientRow::from).collect();
             output::print_axi_list(
                 &rows,
@@ -164,7 +168,6 @@ fn delete(client: &Client, mode: OutputMode, id: &str) -> Result<()> {
             output::print_confirm(&format!("Deleted recipient {}", id));
         }
         OutputMode::Axi => {
-            let _json: serde_json::Value = resp.json()?;
             output::print_axi_confirm(
                 &format!("Deleted recipient {}", id),
                 &["recipients list"],

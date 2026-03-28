@@ -339,7 +339,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     output::print_confirm(&format!("Deleted check {}", token));
                 }
                 OutputMode::Axi => {
-                    let _json: serde_json::Value = resp.json()?;
                     output::print_axi_confirm(
                         &format!("Deleted check {}", token),
                         &["checks list"],

@@ -267,7 +267,6 @@ fn delete(client: &Client, mode: OutputMode, token: &str) -> Result<()> {
             output::print_confirm(&format!("Deleted status page {}", token));
         }
         OutputMode::Axi => {
-            let _json: serde_json::Value = resp.json()?;
             output::print_axi_confirm(
                 &format!("Deleted status page {}", token),
                 &["status-pages list"],
