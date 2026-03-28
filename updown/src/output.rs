@@ -82,7 +82,6 @@ pub fn print_raw(text: &str) {
 
 /// Truncates a string field to `max` bytes for AXI output.
 /// Fields exceeding `max` are cut and appended with `...[{original_len}]`.
-#[allow(dead_code)]
 pub fn truncate_field(value: &str, max: usize) -> String {
     if value.len() <= max {
         return value.to_string();
@@ -111,7 +110,6 @@ pub fn truncate_field(value: &str, max: usize) -> String {
 }
 
 /// Formats a list of items as AXI output: summary + TOON + help hints.
-#[allow(dead_code)]
 pub fn format_axi_list<T: Serialize>(
     items: &[T],
     resource_name: &str,
@@ -143,7 +141,6 @@ pub fn format_axi_list<T: Serialize>(
 }
 
 /// Formats a single item detail as AXI output: TOON + help hints.
-#[allow(dead_code)]
 pub fn format_axi_detail<T: Serialize>(item: &T, hints: &[&str]) -> String {
     let mut out = match encode_default(&item) {
         Ok(toon) => toon,
@@ -159,7 +156,6 @@ pub fn format_axi_detail<T: Serialize>(item: &T, hints: &[&str]) -> String {
 }
 
 /// Formats a confirmation message as AXI output with help hints.
-#[allow(dead_code)]
 pub fn format_axi_confirm(message: &str, hints: &[&str]) -> String {
     let mut out = format!("{}\n", message);
     if !hints.is_empty() {
@@ -169,13 +165,11 @@ pub fn format_axi_confirm(message: &str, hints: &[&str]) -> String {
 }
 
 /// Formats a structured error as AXI output (printed to stdout with exit 0).
-#[allow(dead_code)]
 pub fn format_axi_error(code: u16, message: &str) -> String {
     format!("error{{code,message}}:\n  {},{}\n", code, message)
 }
 
 /// Prints AXI list output to stdout.
-#[allow(dead_code)]
 pub fn print_axi_list<T: Serialize>(
     items: &[T],
     resource_name: &str,
@@ -189,19 +183,16 @@ pub fn print_axi_list<T: Serialize>(
 }
 
 /// Prints AXI detail output to stdout.
-#[allow(dead_code)]
 pub fn print_axi_detail<T: Serialize>(item: &T, hints: &[&str]) {
     print!("{}", format_axi_detail(item, hints));
 }
 
 /// Prints AXI confirmation to stdout.
-#[allow(dead_code)]
 pub fn print_axi_confirm(message: &str, hints: &[&str]) {
     print!("{}", format_axi_confirm(message, hints));
 }
 
 /// Prints AXI error to stdout.
-#[allow(dead_code)]
 pub fn print_axi_error(code: u16, message: &str) {
     print!("{}", format_axi_error(code, message));
 }
