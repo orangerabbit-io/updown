@@ -243,7 +243,7 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Table => {
+                OutputMode::Table | OutputMode::Axi => {
                     let check: Check = resp.json()?;
                     output::print_confirm(&format!(
                         "Check created: {} ({})",
@@ -300,7 +300,7 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Table => {
+                OutputMode::Table | OutputMode::Axi => {
                     let check: Check = resp.json()?;
                     output::print_confirm(&format!(
                         "Check updated: {} ({})",
@@ -319,7 +319,7 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Table => {
+                OutputMode::Table | OutputMode::Axi => {
                     output::print_confirm(&format!("Deleted check {}", token));
                 }
             }
@@ -349,7 +349,7 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Table => {
+                OutputMode::Table | OutputMode::Axi => {
                     let downtimes: Vec<Downtime> = resp.json()?;
                     let rows: Vec<DowntimeRow> = downtimes.iter().map(DowntimeRow::from).collect();
                     output::print_table(&rows);
@@ -383,7 +383,7 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Table => {
+                OutputMode::Table | OutputMode::Axi => {
                     // Metrics are a complex nested structure — display as formatted JSON
                     // even in table mode, since they don't map well to a flat table
                     let json: serde_json::Value = resp.json()?;
@@ -404,7 +404,7 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let checks: Vec<Check> = resp.json()?;
             let rows: Vec<CheckRow> = checks.iter().map(CheckRow::from).collect();
             output::print_table(&rows);
@@ -427,7 +427,7 @@ fn get(client: &Client, mode: OutputMode, token: &str, metrics: bool) -> Result<
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let check: Check = resp.json()?;
             let mut pairs = vec![
                 ("Token", check.token.clone()),

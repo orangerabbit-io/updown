@@ -97,7 +97,7 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let pages: Vec<StatusPage> = resp.json()?;
             let rows: Vec<StatusPageRow> = pages.iter().map(StatusPageRow::from).collect();
             output::print_table(&rows);
@@ -147,7 +147,7 @@ fn create(
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let sp: StatusPage = resp.json()?;
             output::print_confirm(&format!(
                 "Status page created: {} ({})",
@@ -204,7 +204,7 @@ fn update(
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let sp: StatusPage = resp.json()?;
             output::print_confirm(&format!("Status page updated: {}", sp.token));
         }
@@ -221,7 +221,7 @@ fn delete(client: &Client, mode: OutputMode, token: &str) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             output::print_confirm(&format!("Deleted status page {}", token));
         }
     }

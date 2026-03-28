@@ -14,7 +14,7 @@ fn test_status_pages_list() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "status-pages", "list"])
+    cmd.args(["--api-key", "test-key", "--table", "status-pages", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -35,7 +35,7 @@ fn test_status_pages_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "status-pages", "delete", "sp123"])
+    cmd.args(["--api-key", "test-key", "--table", "status-pages", "delete", "sp123"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -58,6 +58,7 @@ fn test_status_pages_create() {
     cmd.args([
         "--api-key",
         "test-key",
+        "--table",
         "status-pages",
         "create",
         "--checks",
@@ -87,6 +88,7 @@ fn test_status_pages_update() {
     cmd.args([
         "--api-key",
         "test-key",
+        "--table",
         "status-pages",
         "update",
         "sp123",

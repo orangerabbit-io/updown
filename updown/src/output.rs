@@ -4,12 +4,17 @@
 //! `print_*` function rather than formatting output themselves. This keeps
 //! display logic centralized and makes it straightforward to add new output
 //! formats in the future.
+//!
+//! Use `--json` for machine-readable JSON output, `--table` for explicit
+//! human-readable table output, or neither for the default Axi format.
 
 use tabled::{Table, Tabled};
 
-/// Controls whether output is rendered as a human-readable table or raw JSON.
+/// Controls how output is rendered.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum OutputMode {
+    /// Token-efficient TOON format with aggregates and help hints (default).
+    Axi,
     /// Columnar table output suitable for human reading.
     Table,
     /// Pretty-printed JSON suitable for piping or scripting.
@@ -17,12 +22,14 @@ pub enum OutputMode {
 }
 
 impl OutputMode {
-    /// Converts the `--json` boolean flag into an [`OutputMode`].
-    pub fn from_json_flag(json: bool) -> Self {
+    /// Determines output mode from CLI flags. No flags = Axi (default).
+    pub fn from_flags(json: bool, table: bool) -> Self {
         if json {
             OutputMode::Json
-        } else {
+        } else if table {
             OutputMode::Table
+        } else {
+            OutputMode::Axi
         }
     }
 }
@@ -76,8 +83,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_output_mode_from_flag() {
-        assert_eq!(OutputMode::from_json_flag(true), OutputMode::Json);
-        assert_eq!(OutputMode::from_json_flag(false), OutputMode::Table);
+    fn test_output_mode_default_is_axi() {
+        assert_eq!(OutputMode::from_flags(false, false), OutputMode::Axi);
+    }
+
+    #[test]
+    fn test_output_mode_json_flag() {
+        assert_eq!(OutputMode::from_flags(true, false), OutputMode::Json);
+    }
+
+    #[test]
+    fn test_output_mode_table_flag() {
+        assert_eq!(OutputMode::from_flags(false, true), OutputMode::Table);
     }
 }

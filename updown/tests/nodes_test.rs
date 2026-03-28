@@ -14,7 +14,7 @@ fn test_nodes_list_table() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "nodes", "list"])
+    cmd.args(["--api-key", "test-key", "--table", "nodes", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -35,7 +35,7 @@ fn test_nodes_ips_ipv4() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "nodes", "ips", "--ipv4"])
+    cmd.args(["--api-key", "test-key", "--table", "nodes", "ips", "--ipv4"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -84,7 +84,7 @@ fn test_nodes_ips_ipv6() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "nodes", "ips", "--ipv6"])
+    cmd.args(["--api-key", "test-key", "--table", "nodes", "ips", "--ipv6"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()

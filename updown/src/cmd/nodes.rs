@@ -40,7 +40,7 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let nodes: HashMap<String, Node> = resp.json()?;
             let mut rows: Vec<NodeRow> = nodes
                 .iter()
@@ -96,7 +96,7 @@ fn ips(
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let ips: Vec<String> = resp.json()?;
             for ip in &ips {
                 println!("{}", ip);

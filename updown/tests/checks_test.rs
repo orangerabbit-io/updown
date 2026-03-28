@@ -14,7 +14,7 @@ fn test_checks_list_table() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "list"])
+    cmd.args(["--api-key", "test-key", "--table", "checks", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -55,7 +55,7 @@ fn test_checks_get() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "get", "abc123"])
+    cmd.args(["--api-key", "test-key", "--table", "checks", "get", "abc123"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -76,7 +76,7 @@ fn test_checks_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "delete", "abc123"])
+    cmd.args(["--api-key", "test-key", "--table", "checks", "delete", "abc123"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -122,6 +122,7 @@ fn test_checks_create() {
     cmd.args([
         "--api-key",
         "test-key",
+        "--table",
         "checks",
         "create",
         "https://new.example.com",
@@ -186,6 +187,7 @@ fn test_checks_update() {
     cmd.args([
         "--api-key",
         "test-key",
+        "--table",
         "checks",
         "update",
         "abc123",
@@ -211,7 +213,7 @@ fn test_checks_downtimes() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "downtimes", "abc123"])
+    cmd.args(["--api-key", "test-key", "--table", "checks", "downtimes", "abc123"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -275,6 +277,7 @@ fn test_checks_get_with_metrics() {
     cmd.args([
         "--api-key",
         "test-key",
+        "--table",
         "checks",
         "get",
         "abc123",

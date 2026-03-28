@@ -3,8 +3,9 @@
 //! Command-line interface for the [updown.io](https://updown.io) website monitoring API.
 //!
 //! Supports full CRUD for checks, recipients, and status pages, plus read access to
-//! monitoring nodes and downtime history. Output defaults to a human-readable table;
-//! pass `--json` for machine-readable output.
+//! monitoring nodes and downtime history. Output defaults to Axi format (token-efficient
+//! TOON format); pass `--table` for human-readable table output or `--json` for
+//! machine-readable output.
 //!
 //! ## Configuration
 //!
@@ -29,9 +30,13 @@ pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
 
-    /// Force JSON output
-    #[arg(long, global = true)]
+    /// Output as JSON
+    #[arg(long, global = true, conflicts_with = "table")]
     pub json: bool,
+
+    /// Output as human-readable table
+    #[arg(long, global = true, conflicts_with = "json")]
+    pub table: bool,
 
     /// API key (overrides config file and env var)
     #[arg(long, global = true)]
@@ -89,7 +94,7 @@ fn main() {
 fn run(cli: Cli) -> Result<()> {
     let config = Config::load(cli.api_key.as_deref())?;
     let client = Client::new(config.api_key, config.base_url)?;
-    let mode = output::OutputMode::from_json_flag(cli.json);
+    let mode = output::OutputMode::from_flags(cli.json, cli.table);
 
     match cli.command {
         Commands::Checks { action } => cmd::checks::run(action, &client, mode),

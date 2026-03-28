@@ -62,7 +62,7 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let recipients: Vec<Recipient> = resp.json()?;
             let rows: Vec<RecipientRow> = recipients.iter().map(RecipientRow::from).collect();
             output::print_table(&rows);
@@ -103,7 +103,7 @@ fn create(
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             let r: Recipient = resp.json()?;
             output::print_confirm(&format!(
                 "Recipient created: {} ({} {})",
@@ -125,7 +125,7 @@ fn delete(client: &Client, mode: OutputMode, id: &str) -> Result<()> {
             let json: serde_json::Value = resp.json()?;
             output::print_json(&json);
         }
-        OutputMode::Table => {
+        OutputMode::Table | OutputMode::Axi => {
             output::print_confirm(&format!("Deleted recipient {}", id));
         }
     }
