@@ -182,7 +182,10 @@ pub fn print_axi_list<T: Serialize>(
     aggregate: &str,
     hints: &[&str],
 ) {
-    print!("{}", format_axi_list(items, resource_name, aggregate, hints));
+    print!(
+        "{}",
+        format_axi_list(items, resource_name, aggregate, hints)
+    );
 }
 
 /// Prints AXI detail output to stdout.
@@ -255,8 +258,7 @@ mod tests {
             serde_json::json!({"token": "abc", "status": "up"}),
             serde_json::json!({"token": "def", "status": "down"}),
         ];
-        let output =
-            format_axi_list(&rows, "checks", "2 checks, 1 down", &["checks get <token>"]);
+        let output = format_axi_list(&rows, "checks", "2 checks, 1 down", &["checks get <token>"]);
         assert!(output.contains("summary: 2 checks, 1 down"));
         assert!(output.contains("help[checks get <token>]"));
     }
@@ -264,8 +266,7 @@ mod tests {
     #[test]
     fn test_format_axi_list_empty() {
         let rows: Vec<serde_json::Value> = vec![];
-        let output =
-            format_axi_list(&rows, "checks", "0 checks", &["checks create --url <url>"]);
+        let output = format_axi_list(&rows, "checks", "0 checks", &["checks create --url <url>"]);
         assert!(output.contains("summary: 0 checks"));
         assert!(output.contains("checks[0]"));
         assert!(output.contains("help[checks create --url <url>]"));
@@ -280,8 +281,7 @@ mod tests {
 
     #[test]
     fn test_format_axi_confirm() {
-        let output =
-            format_axi_confirm("Check created: abc1", &["checks get abc1", "checks list"]);
+        let output = format_axi_confirm("Check created: abc1", &["checks get abc1", "checks list"]);
         assert!(output.contains("Check created: abc1"));
         assert!(output.contains("help[checks get abc1, checks list]"));
     }

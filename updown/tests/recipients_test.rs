@@ -35,11 +35,18 @@ fn test_recipients_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "recipients", "delete", "rec123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("Deleted recipient rec123"));
+    cmd.args([
+        "--api-key",
+        "test-key",
+        "--table",
+        "recipients",
+        "delete",
+        "rec123",
+    ])
+    .env("UPDOWN_BASE_URL", server.url())
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("Deleted recipient rec123"));
 
     mock.assert();
 }

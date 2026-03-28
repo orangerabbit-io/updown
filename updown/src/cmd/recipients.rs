@@ -168,10 +168,7 @@ fn delete(client: &Client, mode: OutputMode, id: &str) -> Result<()> {
             output::print_confirm(&format!("Deleted recipient {}", id));
         }
         OutputMode::Axi => {
-            output::print_axi_confirm(
-                &format!("Deleted recipient {}", id),
-                &["recipients list"],
-            );
+            output::print_axi_confirm(&format!("Deleted recipient {}", id), &["recipients list"]);
         }
     }
 

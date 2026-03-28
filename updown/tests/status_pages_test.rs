@@ -35,11 +35,18 @@ fn test_status_pages_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "status-pages", "delete", "sp123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("Deleted status page sp123"));
+    cmd.args([
+        "--api-key",
+        "test-key",
+        "--table",
+        "status-pages",
+        "delete",
+        "sp123",
+    ])
+    .env("UPDOWN_BASE_URL", server.url())
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("Deleted status page sp123"));
 
     mock.assert();
 }

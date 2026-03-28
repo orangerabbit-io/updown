@@ -569,9 +569,9 @@ fn get(client: &Client, mode: OutputMode, token: &str, metrics: bool) -> Result<
             if let Some(ref hdrs) = check.custom_headers {
                 let hdrs_str = hdrs.to_string();
                 if hdrs_str.len() > 200 {
-                    check.custom_headers = Some(serde_json::Value::String(
-                        output::truncate_field(&hdrs_str, 200),
-                    ));
+                    check.custom_headers = Some(serde_json::Value::String(output::truncate_field(
+                        &hdrs_str, 200,
+                    )));
                 }
             }
             let h1 = format!("checks update {}", token);

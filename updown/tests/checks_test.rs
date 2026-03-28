@@ -55,12 +55,19 @@ fn test_checks_get() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "checks", "get", "abc123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("abc123"))
-        .stdout(predicate::str::contains("example.com"));
+    cmd.args([
+        "--api-key",
+        "test-key",
+        "--table",
+        "checks",
+        "get",
+        "abc123",
+    ])
+    .env("UPDOWN_BASE_URL", server.url())
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("abc123"))
+    .stdout(predicate::str::contains("example.com"));
 
     mock.assert();
 }
@@ -76,11 +83,18 @@ fn test_checks_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "checks", "delete", "abc123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("Deleted check abc123"));
+    cmd.args([
+        "--api-key",
+        "test-key",
+        "--table",
+        "checks",
+        "delete",
+        "abc123",
+    ])
+    .env("UPDOWN_BASE_URL", server.url())
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("Deleted check abc123"));
 
     mock.assert();
 }
@@ -214,12 +228,19 @@ fn test_checks_downtimes() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "checks", "downtimes", "abc123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("dt1"))
-        .stdout(predicate::str::contains("timeout"));
+    cmd.args([
+        "--api-key",
+        "test-key",
+        "--table",
+        "checks",
+        "downtimes",
+        "abc123",
+    ])
+    .env("UPDOWN_BASE_URL", server.url())
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("dt1"))
+    .stdout(predicate::str::contains("timeout"));
 
     mock.assert();
 }
