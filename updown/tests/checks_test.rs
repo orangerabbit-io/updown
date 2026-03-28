@@ -292,6 +292,29 @@ fn test_checks_get_with_metrics() {
 }
 
 #[test]
+fn test_checks_list_axi_default() {
+    let mut server = Server::new();
+    let mock = server
+        .mock("GET", "/api/checks")
+        .match_header("X-API-KEY", "test-key")
+        .with_body(common::fixture("checks_list_multi.json"))
+        .with_header("content-type", "application/json")
+        .create();
+
+    let mut cmd = common::binary();
+    cmd.args(["--api-key", "test-key", "checks", "list"])
+        .env("UPDOWN_BASE_URL", server.url())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("summary:"))
+        .stdout(predicate::str::contains("2 checks"))
+        .stdout(predicate::str::contains("1 down"))
+        .stdout(predicate::str::contains("help["));
+
+    mock.assert();
+}
+
+#[test]
 fn test_checks_not_found_error() {
     let mut server = Server::new();
     let mock = server
