@@ -21,7 +21,7 @@ pub struct ApiError {
 
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} (HTTP {})", self.message, self.status_code)
+        write!(f, "{}", self.message)
     }
 }
 

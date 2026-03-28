@@ -80,8 +80,8 @@ pub fn print_raw(text: &str) {
     print!("{}", text);
 }
 
-/// Truncates a string field to `max` characters for AXI output.
-/// Fields exceeding `max` are cut to `max - suffix_len` and appended with `...[{original_len}]`.
+/// Truncates a string field to `max` bytes for AXI output.
+/// Fields exceeding `max` are cut and appended with `...[{original_len}]`.
 #[allow(dead_code)]
 pub fn truncate_field(value: &str, max: usize) -> String {
     if value.len() <= max {
@@ -89,6 +89,16 @@ pub fn truncate_field(value: &str, max: usize) -> String {
     }
     let total = value.len();
     let suffix = format!("...[{}]", total);
+    if suffix.len() >= max {
+        // Max is too small to fit the suffix — hard-truncate
+        let safe = value
+            .char_indices()
+            .take_while(|(i, c)| i + c.len_utf8() <= max)
+            .last()
+            .map(|(i, c)| i + c.len_utf8())
+            .unwrap_or(0);
+        return value[..safe].to_string();
+    }
     let keep = max - suffix.len();
     // Find a safe UTF-8 boundary at or before `keep`
     let safe_keep = value
@@ -161,7 +171,7 @@ pub fn format_axi_confirm(message: &str, hints: &[&str]) -> String {
 /// Formats a structured error as AXI output (printed to stdout with exit 0).
 #[allow(dead_code)]
 pub fn format_axi_error(code: u16, message: &str) -> String {
-    format!("error{{code,message}}:\n  {},{}", code, message)
+    format!("error{{code,message}}:\n  {},{}\n", code, message)
 }
 
 /// Prints AXI list output to stdout.
@@ -230,6 +240,13 @@ mod tests {
         assert!(result.len() < 300);
         assert!(result.ends_with("[300]"));
         assert!(result.contains("..."));
+    }
+
+    #[test]
+    fn test_truncate_field_tiny_max() {
+        let result = truncate_field("hello world", 5);
+        assert_eq!(result.len(), 5);
+        assert_eq!(result, "hello");
     }
 
     #[test]
