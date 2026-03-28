@@ -384,8 +384,14 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                         downtimes.len(),
                         total_duration
                     );
-                    let rows: Vec<DowntimeRow> =
-                        downtimes.iter().map(DowntimeRow::from).collect();
+                    let rows: Vec<DowntimeRow> = downtimes
+                        .iter()
+                        .map(|d| {
+                            let mut row = DowntimeRow::from(d);
+                            row.error = output::truncate_field(&row.error, 200);
+                            row
+                        })
+                        .collect();
                     let h1 = format!("checks get {}", token);
                     let h2 = format!("checks metrics {}", token);
                     output::print_axi_list(&rows, "downtimes", &aggregate, &[&h1, &h2]);
@@ -555,7 +561,19 @@ fn get(client: &Client, mode: OutputMode, token: &str, metrics: bool) -> Result<
             output::print_kv(&pair_refs);
         }
         OutputMode::Axi => {
-            let check: Check = resp.json()?;
+            let mut check: Check = resp.json()?;
+            // Truncate long fields for AXI output
+            if let Some(ref body) = check.http_body {
+                check.http_body = Some(output::truncate_field(body, 200));
+            }
+            if let Some(ref hdrs) = check.custom_headers {
+                let hdrs_str = hdrs.to_string();
+                if hdrs_str.len() > 200 {
+                    check.custom_headers = Some(serde_json::Value::String(
+                        output::truncate_field(&hdrs_str, 200),
+                    ));
+                }
+            }
             let h1 = format!("checks update {}", token);
             let h2 = format!("checks downtimes {}", token);
             let h3 = format!("checks metrics {}", token);
