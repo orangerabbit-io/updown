@@ -3,9 +3,8 @@
 //! Command-line interface for the [updown.io](https://updown.io) website monitoring API.
 //!
 //! Supports full CRUD for checks, recipients, and status pages, plus read access to
-//! monitoring nodes and downtime history. Output defaults to Axi format (token-efficient
-//! TOON format); pass `--table` for human-readable table output or `--json` for
-//! machine-readable output.
+//! monitoring nodes and downtime history. Output defaults to a human-readable table;
+//! pass `--json` for machine-readable output.
 //!
 //! ## Configuration
 //!
@@ -20,7 +19,7 @@ mod output;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::process;
-use updown_lib::client::{ApiError, Client};
+use updown_lib::client::Client;
 use updown_lib::config::Config;
 
 /// Top-level CLI entry point parsed by clap.
@@ -30,13 +29,9 @@ pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
 
-    /// Output as JSON
-    #[arg(long, global = true, conflicts_with = "table")]
+    /// Force JSON output
+    #[arg(long, global = true)]
     pub json: bool,
-
-    /// Output as human-readable table
-    #[arg(long, global = true, conflicts_with = "json")]
-    pub table: bool,
 
     /// API key (overrides config file and env var)
     #[arg(long, global = true)]
@@ -71,17 +66,8 @@ pub enum Commands {
 
 fn main() {
     let cli = Cli::parse();
-    let mode = output::OutputMode::from_flags(cli.json, cli.table);
 
-    if let Err(e) = run(cli, mode) {
-        // In AXI mode, known API errors go to stdout with exit 0
-        if mode == output::OutputMode::Axi {
-            if let Some(api_err) = e.downcast_ref::<ApiError>() {
-                output::print_axi_error(api_err.status_code, &api_err.message);
-                return;
-            }
-        }
-
+    if let Err(e) = run(cli) {
         eprintln!("Error: {:#}", e);
 
         let exit_code = if format!("{:#}", e).contains("No API key found")
@@ -100,9 +86,10 @@ fn main() {
 ///
 /// Returns an error if the API key is missing, the HTTP client cannot be constructed,
 /// or the subcommand itself fails.
-fn run(cli: Cli, mode: output::OutputMode) -> Result<()> {
+fn run(cli: Cli) -> Result<()> {
     let config = Config::load(cli.api_key.as_deref())?;
     let client = Client::new(config.api_key, config.base_url)?;
+    let mode = output::OutputMode::from_json_flag(cli.json);
 
     match cli.command {
         Commands::Checks { action } => cmd::checks::run(action, &client, mode),

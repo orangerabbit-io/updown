@@ -250,14 +250,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                         check.token, check.url
                     ));
                 }
-                OutputMode::Axi => {
-                    let check: Check = resp.json()?;
-                    let h1 = format!("checks get {}", check.token);
-                    output::print_axi_confirm(
-                        &format!("Check created: {} ({})", check.token, check.url),
-                        &[&h1, "checks list"],
-                    );
-                }
             }
 
             Ok(())
@@ -315,14 +307,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                         check.token, check.url
                     ));
                 }
-                OutputMode::Axi => {
-                    let check: Check = resp.json()?;
-                    let h1 = format!("checks get {}", check.token);
-                    output::print_axi_confirm(
-                        &format!("Check updated: {} ({})", check.token, check.url),
-                        &[&h1, "checks list"],
-                    );
-                }
             }
 
             Ok(())
@@ -337,12 +321,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                 }
                 OutputMode::Table => {
                     output::print_confirm(&format!("Deleted check {}", token));
-                }
-                OutputMode::Axi => {
-                    output::print_axi_confirm(
-                        &format!("Deleted check {}", token),
-                        &["checks list"],
-                    );
                 }
             }
 
@@ -375,26 +353,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let downtimes: Vec<Downtime> = resp.json()?;
                     let rows: Vec<DowntimeRow> = downtimes.iter().map(DowntimeRow::from).collect();
                     output::print_table(&rows);
-                }
-                OutputMode::Axi => {
-                    let downtimes: Vec<Downtime> = resp.json()?;
-                    let total_duration: u64 = downtimes.iter().filter_map(|d| d.duration).sum();
-                    let aggregate = format!(
-                        "{} downtimes, total_duration: {}s",
-                        downtimes.len(),
-                        total_duration
-                    );
-                    let rows: Vec<DowntimeRow> = downtimes
-                        .iter()
-                        .map(|d| {
-                            let mut row = DowntimeRow::from(d);
-                            row.error = output::truncate_field(&row.error, 200);
-                            row
-                        })
-                        .collect();
-                    let h1 = format!("checks get {}", token);
-                    let h2 = format!("checks metrics {}", token);
-                    output::print_axi_list(&rows, "downtimes", &aggregate, &[&h1, &h2]);
                 }
             }
 
@@ -431,19 +389,6 @@ pub fn run(action: ChecksAction, client: &Client, mode: OutputMode) -> Result<()
                     let json: serde_json::Value = resp.json()?;
                     output::print_json(&json);
                 }
-                OutputMode::Axi => {
-                    let json: serde_json::Value = resp.json()?;
-                    let apdex = json
-                        .get("apdex")
-                        .and_then(|v| v.as_f64())
-                        .map(|a| format!("{:.4}", a))
-                        .unwrap_or_else(|| "-".to_string());
-                    let h1 = format!("checks get {}", token);
-                    let h2 = format!("checks downtimes {}", token);
-                    let mut out = format!("summary: apdex: {}\n", apdex);
-                    out.push_str(&output::format_axi_detail(&json, &[&h1, &h2]));
-                    print!("{}", out);
-                }
             }
 
             Ok(())
@@ -463,29 +408,6 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let checks: Vec<Check> = resp.json()?;
             let rows: Vec<CheckRow> = checks.iter().map(CheckRow::from).collect();
             output::print_table(&rows);
-        }
-        OutputMode::Axi => {
-            let checks: Vec<Check> = resp.json()?;
-            let down_count = checks.iter().filter(|c| c.down == Some(true)).count();
-            let worst_uptime = checks
-                .iter()
-                .filter_map(|c| c.uptime)
-                .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
-                .map(|u| format!("{:.2}%", u))
-                .unwrap_or_else(|| "-".to_string());
-            let aggregate = format!(
-                "{} checks, {} down, worst_uptime: {}",
-                checks.len(),
-                down_count,
-                worst_uptime
-            );
-            let rows: Vec<CheckRow> = checks.iter().map(CheckRow::from).collect();
-            output::print_axi_list(
-                &rows,
-                "checks",
-                &aggregate,
-                &["checks get <token> --metrics", "checks downtimes <token>"],
-            );
         }
     }
 
@@ -559,25 +481,6 @@ fn get(client: &Client, mode: OutputMode, token: &str, metrics: bool) -> Result<
 
             let pair_refs: Vec<(&str, String)> = pairs.into_iter().collect();
             output::print_kv(&pair_refs);
-        }
-        OutputMode::Axi => {
-            let mut check: Check = resp.json()?;
-            // Truncate long fields for AXI output
-            if let Some(ref body) = check.http_body {
-                check.http_body = Some(output::truncate_field(body, 200));
-            }
-            if let Some(ref hdrs) = check.custom_headers {
-                let hdrs_str = hdrs.to_string();
-                if hdrs_str.len() > 200 {
-                    check.custom_headers = Some(serde_json::Value::String(output::truncate_field(
-                        &hdrs_str, 200,
-                    )));
-                }
-            }
-            let h1 = format!("checks update {}", token);
-            let h2 = format!("checks downtimes {}", token);
-            let h3 = format!("checks metrics {}", token);
-            output::print_axi_detail(&check, &[&h1, &h2, &h3]);
         }
     }
 

@@ -14,7 +14,7 @@ fn test_recipients_list() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "recipients", "list"])
+    cmd.args(["--api-key", "test-key", "recipients", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -35,18 +35,11 @@ fn test_recipients_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args([
-        "--api-key",
-        "test-key",
-        "--table",
-        "recipients",
-        "delete",
-        "rec123",
-    ])
-    .env("UPDOWN_BASE_URL", server.url())
-    .assert()
-    .success()
-    .stdout(predicate::str::contains("Deleted recipient rec123"));
+    cmd.args(["--api-key", "test-key", "recipients", "delete", "rec123"])
+        .env("UPDOWN_BASE_URL", server.url())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Deleted recipient rec123"));
 
     mock.assert();
 }
@@ -65,7 +58,6 @@ fn test_recipients_create() {
     cmd.args([
         "--api-key",
         "test-key",
-        "--table",
         "recipients",
         "create",
         "email",

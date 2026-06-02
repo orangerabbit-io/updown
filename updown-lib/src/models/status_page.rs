@@ -30,7 +30,7 @@ pub struct StatusPage {
 }
 
 /// Flattened, display-ready representation of a [`StatusPage`] for table output.
-#[derive(Debug, Serialize, Tabled)]
+#[derive(Debug, Tabled)]
 pub struct StatusPageRow {
     #[tabled(rename = "TOKEN")]
     pub token: String,

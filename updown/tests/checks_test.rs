@@ -14,7 +14,7 @@ fn test_checks_list_table() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "--table", "checks", "list"])
+    cmd.args(["--api-key", "test-key", "checks", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
         .success()
@@ -55,19 +55,12 @@ fn test_checks_get() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args([
-        "--api-key",
-        "test-key",
-        "--table",
-        "checks",
-        "get",
-        "abc123",
-    ])
-    .env("UPDOWN_BASE_URL", server.url())
-    .assert()
-    .success()
-    .stdout(predicate::str::contains("abc123"))
-    .stdout(predicate::str::contains("example.com"));
+    cmd.args(["--api-key", "test-key", "checks", "get", "abc123"])
+        .env("UPDOWN_BASE_URL", server.url())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("abc123"))
+        .stdout(predicate::str::contains("example.com"));
 
     mock.assert();
 }
@@ -83,18 +76,11 @@ fn test_checks_delete() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args([
-        "--api-key",
-        "test-key",
-        "--table",
-        "checks",
-        "delete",
-        "abc123",
-    ])
-    .env("UPDOWN_BASE_URL", server.url())
-    .assert()
-    .success()
-    .stdout(predicate::str::contains("Deleted check abc123"));
+    cmd.args(["--api-key", "test-key", "checks", "delete", "abc123"])
+        .env("UPDOWN_BASE_URL", server.url())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Deleted check abc123"));
 
     mock.assert();
 }
@@ -112,9 +98,8 @@ fn test_checks_auth_error() {
     cmd.args(["--api-key", "bad-key", "checks", "list"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
-        .success()
-        .stdout(predicate::str::contains("error{code,message}:"))
-        .stdout(predicate::str::contains("401"));
+        .failure()
+        .stderr(predicate::str::contains("Authentication failed"));
 
     mock.assert();
 }
@@ -137,7 +122,6 @@ fn test_checks_create() {
     cmd.args([
         "--api-key",
         "test-key",
-        "--table",
         "checks",
         "create",
         "https://new.example.com",
@@ -202,7 +186,6 @@ fn test_checks_update() {
     cmd.args([
         "--api-key",
         "test-key",
-        "--table",
         "checks",
         "update",
         "abc123",
@@ -228,19 +211,12 @@ fn test_checks_downtimes() {
         .create();
 
     let mut cmd = common::binary();
-    cmd.args([
-        "--api-key",
-        "test-key",
-        "--table",
-        "checks",
-        "downtimes",
-        "abc123",
-    ])
-    .env("UPDOWN_BASE_URL", server.url())
-    .assert()
-    .success()
-    .stdout(predicate::str::contains("dt1"))
-    .stdout(predicate::str::contains("timeout"));
+    cmd.args(["--api-key", "test-key", "checks", "downtimes", "abc123"])
+        .env("UPDOWN_BASE_URL", server.url())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("dt1"))
+        .stdout(predicate::str::contains("timeout"));
 
     mock.assert();
 }
@@ -299,7 +275,6 @@ fn test_checks_get_with_metrics() {
     cmd.args([
         "--api-key",
         "test-key",
-        "--table",
         "checks",
         "get",
         "abc123",
@@ -309,70 +284,6 @@ fn test_checks_get_with_metrics() {
     .assert()
     .success()
     .stdout(predicate::str::contains("abc123"));
-
-    mock.assert();
-}
-
-#[test]
-fn test_checks_list_axi_error_401() {
-    let mut server = Server::new();
-    let mock = server
-        .mock("GET", "/api/checks")
-        .match_header("X-API-KEY", "bad-key")
-        .with_status(401)
-        .with_body("Unauthorized")
-        .create();
-
-    let mut cmd = common::binary();
-    cmd.args(["--api-key", "bad-key", "checks", "list"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("error{code,message}:"))
-        .stdout(predicate::str::contains("401"));
-
-    mock.assert();
-}
-
-#[test]
-fn test_checks_list_json_error_401() {
-    let mut server = Server::new();
-    let mock = server
-        .mock("GET", "/api/checks")
-        .match_header("X-API-KEY", "bad-key")
-        .with_status(401)
-        .with_body("Unauthorized")
-        .create();
-
-    let mut cmd = common::binary();
-    cmd.args(["--api-key", "bad-key", "--json", "checks", "list"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .failure()
-        .stderr(predicate::str::contains("Authentication failed"));
-
-    mock.assert();
-}
-
-#[test]
-fn test_checks_list_axi_default() {
-    let mut server = Server::new();
-    let mock = server
-        .mock("GET", "/api/checks")
-        .match_header("X-API-KEY", "test-key")
-        .with_body(common::fixture("checks_list_multi.json"))
-        .with_header("content-type", "application/json")
-        .create();
-
-    let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "list"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("summary:"))
-        .stdout(predicate::str::contains("2 checks"))
-        .stdout(predicate::str::contains("1 down"))
-        .stdout(predicate::str::contains("help["));
 
     mock.assert();
 }
@@ -390,35 +301,9 @@ fn test_checks_not_found_error() {
     cmd.args(["--api-key", "test-key", "checks", "get", "nonexistent"])
         .env("UPDOWN_BASE_URL", server.url())
         .assert()
-        .success()
-        .stdout(predicate::str::contains("error{code,message}:"))
-        .stdout(predicate::str::contains("404"));
-
-    mock.assert();
-}
-
-#[test]
-fn test_checks_get_axi_truncation() {
-    let long_body = "x".repeat(300);
-    let fixture = format!(
-        r#"{{"token":"abc123","url":"https://example.com","http_body":"{}","down":false}}"#,
-        long_body
-    );
-
-    let mut server = Server::new();
-    let mock = server
-        .mock("GET", "/api/checks/abc123")
-        .match_header("X-API-KEY", "test-key")
-        .with_body(&fixture)
-        .with_header("content-type", "application/json")
-        .create();
-
-    let mut cmd = common::binary();
-    cmd.args(["--api-key", "test-key", "checks", "get", "abc123"])
-        .env("UPDOWN_BASE_URL", server.url())
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("...[300]"));
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains("Not found"));
 
     mock.assert();
 }
