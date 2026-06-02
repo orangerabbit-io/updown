@@ -55,32 +55,6 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             rows.sort_by(|a, b| a.code.cmp(&b.code));
             output::print_table(&rows);
         }
-        OutputMode::Axi => {
-            let nodes: HashMap<String, Node> = resp.json()?;
-            let country_count = nodes
-                .values()
-                .filter_map(|n| n.country_code.as_ref())
-                .collect::<std::collections::HashSet<_>>()
-                .len();
-            let aggregate = format!("{} nodes across {} countries", nodes.len(), country_count);
-            let mut rows: Vec<NodeRow> = nodes
-                .iter()
-                .map(|(code, node)| NodeRow {
-                    code: code.clone(),
-                    city: node.city.clone().unwrap_or_else(|| "-".to_string()),
-                    country: node.country.clone().unwrap_or_else(|| "-".to_string()),
-                    ip: node.ip.clone().unwrap_or_else(|| "-".to_string()),
-                    ip6: node.ip6.clone().unwrap_or_else(|| "-".to_string()),
-                })
-                .collect();
-            rows.sort_by(|a, b| a.code.cmp(&b.code));
-            output::print_axi_list(
-                &rows,
-                "nodes",
-                &aggregate,
-                &["nodes ips --ipv4", "nodes ips --ipv6"],
-            );
-        }
     }
 
     Ok(())
@@ -127,13 +101,6 @@ fn ips(
             for ip in &ips {
                 println!("{}", ip);
             }
-        }
-        OutputMode::Axi => {
-            let ips: Vec<String> = resp.json()?;
-            for ip in &ips {
-                println!("{}", ip);
-            }
-            println!("help[nodes list]");
         }
     }
 

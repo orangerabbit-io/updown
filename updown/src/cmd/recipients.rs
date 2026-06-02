@@ -67,33 +67,6 @@ fn list(client: &Client, mode: OutputMode) -> Result<()> {
             let rows: Vec<RecipientRow> = recipients.iter().map(RecipientRow::from).collect();
             output::print_table(&rows);
         }
-        OutputMode::Axi => {
-            let recipients: Vec<Recipient> = resp.json()?;
-            let mut type_counts: std::collections::HashMap<&str, usize> =
-                std::collections::HashMap::new();
-            for r in &recipients {
-                *type_counts.entry(r.recipient_type.as_str()).or_insert(0) += 1;
-            }
-            let mut counts: Vec<_> = type_counts.into_iter().collect();
-            counts.sort_by_key(|(t, _)| t.to_string());
-            let type_summary = counts
-                .iter()
-                .map(|(t, c)| format!("{} {}", c, t))
-                .collect::<Vec<_>>()
-                .join(", ");
-            let aggregate = if type_summary.is_empty() {
-                format!("{} recipients", recipients.len())
-            } else {
-                format!("{} recipients ({})", recipients.len(), type_summary)
-            };
-            let rows: Vec<RecipientRow> = recipients.iter().map(RecipientRow::from).collect();
-            output::print_axi_list(
-                &rows,
-                "recipients",
-                &aggregate,
-                &["recipients create <type> <value>"],
-            );
-        }
     }
 
     Ok(())
@@ -139,18 +112,6 @@ fn create(
                 r.value.unwrap_or_default()
             ));
         }
-        OutputMode::Axi => {
-            let r: Recipient = resp.json()?;
-            output::print_axi_confirm(
-                &format!(
-                    "Recipient created: {} ({} {})",
-                    r.id,
-                    r.recipient_type,
-                    r.value.unwrap_or_default()
-                ),
-                &["recipients list"],
-            );
-        }
     }
 
     Ok(())
@@ -166,9 +127,6 @@ fn delete(client: &Client, mode: OutputMode, id: &str) -> Result<()> {
         }
         OutputMode::Table => {
             output::print_confirm(&format!("Deleted recipient {}", id));
-        }
-        OutputMode::Axi => {
-            output::print_axi_confirm(&format!("Deleted recipient {}", id), &["recipients list"]);
         }
     }
 
