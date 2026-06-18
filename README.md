@@ -1,3 +1,5 @@
+> This repository is managed by OrangeRabbit.
+
 # updown
 
 A command-line interface for the [updown.io](https://updown.io) monitoring API.
