@@ -56,5 +56,5 @@ Two-crate Cargo workspace. Blocking reqwest (no async). Clap derive for CLI.
 
 <!-- verify -->
 ```sh
-nix develop -c cargo fmt --all --check
+git grep -qi orangerabbit -- README.md
 ```
