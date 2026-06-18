@@ -51,10 +51,3 @@ Two-crate Cargo workspace. Blocking reqwest (no async). Clap derive for CLI.
 ### GitHub
 - Repo: orangerabbit-io/updown
 - CI: semantic-release on push to main
-
-## Conductor verify
-
-<!-- verify -->
-```sh
-git grep -qi orangerabbit -- README.md
-```
