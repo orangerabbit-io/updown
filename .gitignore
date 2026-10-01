@@ -6,3 +6,4 @@ updown/target
 *.pem
 *.key
 node_modules
+.worktrees/
